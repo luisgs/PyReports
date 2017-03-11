@@ -6,6 +6,7 @@ ReportCsv = open(sys.argv[1], "rt")
 # List_Cases = [ [ 'Luis' , [ '123456' , '789456' ] ] , [ 'Javi' , [ '123' ] ] ]
 List_Cases = []
 
+
 def consultantCases(Consultant, CaseNumber):
     "We will insert in Global_Cases[], consultant cases"
     " case [0] = Consultant"
@@ -29,6 +30,5 @@ try:
 #        List_Cases.append([row[0], row[7]])
 finally:
     ReportCsv.close()
-
 
 print(List_Cases)
