@@ -1,7 +1,6 @@
 import csv
 import sys
 
-ReportCsv = open(sys.argv[1], "rt")
 
 # List_Cases = [ [ 'Luis' , [ '123456' , '789456' ] ] , [ 'Javi' , [ '123' ] ] ]
 List_Cases = []
@@ -18,13 +17,18 @@ def consultantCases(Consultant, CaseNumber):
     List_Cases.append([Consultant, [CaseNumber]])
 
 try:
-    reader = csv.reader(ReportCsv)
-    for row in reader:
+    with open(sys.argv[1],"rt") as ReportCsv:
+        next(ReportCsv)     # We skip first line
+        reader = csv.reader(ReportCsv)
+        data = list(reader)
+        row_count = len(data)
+
+    for row in data:
         if len(row) >= 7:
             if List_Cases:  # List is not empty
-                consultantCases(row[7], row[0])
+                consultantCases(row[7], int(row[0]))
             else:
-                List_Cases.append((row[7], [row[0]]))
+                List_Cases.append([row[7], [int(row[0])]])
         else:   # Row comming now are trash
             break
 #        List_Cases.append([row[0], row[7]])
