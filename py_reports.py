@@ -1,7 +1,6 @@
 import csv
 import sys
 
-
 # List_Cases = [ [ 'Luis' , [ '123456' , '789456' ] ] , [ 'Javi' , [ '123' ] ] ]
 List_Cases = []
 
@@ -17,22 +16,22 @@ def consultantCases(Consultant, CaseNumber):
     List_Cases.append([Consultant, [CaseNumber]])
 
 try:
-    with open(sys.argv[1],"rt") as ReportCsv:
-        next(ReportCsv)     # We skip first line
+    with open(sys.argv[1], 'rt') as ReportCsv:
+        next(ReportCsv)     # We skip first line, it is trash
         reader = csv.reader(ReportCsv)
         data = list(reader)
         row_count = len(data)
 
     for row in data:
-        if len(row) >= 7:
-            if List_Cases:  # List is not empty
+        if len(row):        # if we have data!
+            if List_Cases:  # Global list HAS data
                 consultantCases(row[7], int(row[0]))
             else:
                 List_Cases.append([row[7], [int(row[0])]])
-        else:   # Row comming now are trash
+        else:   # Rows comming after are trash
             break
-#        List_Cases.append([row[0], row[7]])
 finally:
+    # Python closes files automatically but... what the hell
     ReportCsv.close()
 
 print(List_Cases)
