@@ -1,5 +1,6 @@
 import csv
 import sys
+import os
 # import warnings
 
 # List_Cases = [ [ 'Luis' , [ '123456' , '789456' ] ] , [ 'Javi' , [ '123' ] ] ]
@@ -16,26 +17,42 @@ def consultantCases(Consultant, CaseNumber):
             return
     List_Cases.append([Consultant, [CaseNumber]])
 
-try:
-    with open(sys.argv[1], 'rt') as ReportCsv:
-        next(ReportCsv)     # We skip first line, it is trash
-        reader = csv.reader(ReportCsv)
-        data = list(reader)
-        row_count = len(data)
-except IOError:
-    print("Err: input file has not been declare or problem while openning")
-    raise
-else:
-    for row in data:
-        if len(row):        # if we have data!
-            if List_Cases:  # Global list HAS data
-                consultantCases(row[7], int(row[0]))
-            else:
-                List_Cases.append([row[7], [int(row[0])]])
-        else:   # Rows comming after are trash
-            break
-finally:
-    # Python closes files automatically but... what the hell
-    ReportCsv.close()
+def doWeHaveAFile():
+    "We have a file as arg that exist and it is readable"
+    if len(sys.argv) < 2:
+        sys.stderr.write('Usage: sys.argv[0], Please pass me a file!\n')
+        sys.exit(1)
+    if not os.path.exists(sys.argv[1]):
+        sys.stderr.write('ERROR: Database sys.argv[1] was not found!\n')
+        sys.exit(1)
+    return 1
 
-print(List_Cases)
+
+def main():
+    doWeHaveAFile()
+    try:
+        with open(sys.argv[1], 'rt') as ReportCsv:
+            next(ReportCsv)     # We skip first line, it is trash
+            reader = csv.reader(ReportCsv)
+            data = list(reader)
+            # row_count = len(data)
+    except (IOError):
+        print("Err: input file has not been declare or problem while openning")
+        sys.exit(1)
+    else:
+        for row in data:
+            if len(row):        # if we have data!
+                if List_Cases:  # Global list HAS data
+                    consultantCases(row[7], int(row[0]))
+                else:
+                    List_Cases.append([row[7], [int(row[0])]])
+            else:   # Rows comming after are trash
+                break
+    finally:
+        # Python closes files automatically but... what the hell
+        ReportCsv.close()
+
+    print(List_Cases)
+
+if __name__ == "__main__":
+    main()
