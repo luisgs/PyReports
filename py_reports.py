@@ -1,7 +1,6 @@
 import csv
 import sys
 import os
-# import warnings
 
 # List_Cases = [ [ 'Luis' , [ '123456' , '789456' ] ] , [ 'Javi' , [ '123' ] ] ]
 List_Cases = []
@@ -17,6 +16,7 @@ def consultantCases(Consultant, CaseNumber):
             return
     List_Cases.append([Consultant, [CaseNumber]])
 
+
 def doWeHaveAFile():
     "We have a file as arg that exist and it is readable"
     if len(sys.argv) < 2:
@@ -26,6 +26,13 @@ def doWeHaveAFile():
         sys.stderr.write('ERROR: Database sys.argv[1] was not found!\n')
         sys.exit(1)
     return 1
+
+
+def printListCases():
+    for consultantInfo in List_Cases:
+        print(consultantInfo[0]+":")
+        for cases in consultantInfo[1]:
+            print("\t %i" % cases)
 
 
 def main():
@@ -52,7 +59,10 @@ def main():
         # Python closes files automatically but... what the hell
         ReportCsv.close()
 
-    print(List_Cases)
+    # print lists!
+    printListCases()
+    # print(List_Cases)
 
 if __name__ == "__main__":
+
     main()
