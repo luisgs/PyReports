@@ -1,5 +1,6 @@
 import csv
 import sys
+# import warnings
 
 # List_Cases = [ [ 'Luis' , [ '123456' , '789456' ] ] , [ 'Javi' , [ '123' ] ] ]
 List_Cases = []
@@ -21,7 +22,10 @@ try:
         reader = csv.reader(ReportCsv)
         data = list(reader)
         row_count = len(data)
-
+except IOError:
+    print("Err: input file has not been declare or problem while openning")
+    raise
+else:
     for row in data:
         if len(row):        # if we have data!
             if List_Cases:  # Global list HAS data
