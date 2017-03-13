@@ -7,12 +7,12 @@ import variables
 variables.init()
 
 
-def emailToConsultant(consultant, listCases):
+def emailToConsultant(employee, listCases):
     # me == my email address
     # consultant == recipient's email address
     print(sys.path)
     me = variables.emailFrom
-    consultant = sys.argv[1]
+    consultant = employee
 
     # Create message container - the correct MIME type is multipart/alternative.
     msg = MIMEMultipart('alternative')
