@@ -38,11 +38,10 @@ def printListCases():
 
 def emailToConsultant():
     for consultantReport in List_Cases:
-        return sendEmail.emailToConsultant("luis.ild@gmail.com", [123, 321])
+        sendEmail.emailToConsultant(consultantReport[0], consultantReport[1])
 
 
 def main():
-    print(sys.path)
     doWeHaveAFile()
     try:
         with open(sys.argv[1], 'rt') as ReportCsv:
