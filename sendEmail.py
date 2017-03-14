@@ -38,7 +38,7 @@ def emailToConsultant(employee, listCases):
     </body>
     </html>
     """
-    print(html)
+#    print(html)
     # Record the MIME types of both parts - text/plain and text/html.
     part1 = MIMEText(text, 'plain')
     part2 = MIMEText(html, 'html')
@@ -56,6 +56,6 @@ def emailToConsultant(employee, listCases):
     s.login(variables.emailFrom, variables.password)
     # sendmail function takes 3 arguments: sender's address, recipient's address
     # and message to send - here it is sent as one string.
-#    s.sendmail(me, consultant, msg.as_string())
-    print("WE HAVE BLOCKED EMAIL TO CONSULTANT")
+#   s.sendmail(me, consultant, msg.as_string())
+#   print("WE HAVE BLOCKED EMAIL TO CONSULTANT")
     s.quit()
