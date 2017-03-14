@@ -41,6 +41,11 @@ def emailToConsultant():
     for consultantReport in List_Cases:
         sendEmail.emailToConsultant(consultantReport[0], consultantReport[1])
 
+DictErrors = ['foo', 'ReqIsNotPart', 'asdf']
+CaseListErrors = [0] * 10 # len(DictErrors) 
+
+ListOfErrors = []
+
 
 def main():
     doWeHaveAFile()
@@ -48,6 +53,7 @@ def main():
         with open(sys.argv[1], 'rt') as ReportCsv:
             reader = csv.reader(ReportCsv)
             data = list(reader)
+            # We read CSV header!
             caseIndex = data[0].index('Case Number')    # caseID
             ownerIndex = data[0].index('Case Owner')    # caseOwner
             ownerEmailIndex = data[0].index('Case Owner eMail')  # ownerEmail
@@ -63,20 +69,24 @@ def main():
             if List_Cases:  # Global list HAS data
                 consultantCases(row[ownerIndex], row[ownerEmailIndex],
                                 int(row[caseIndex]))
-                if functions.RequestorRoleIsPartner(row[reqRoleIndex]):
-                    print("ROle is Partner %s" % row[caseIndex])
-                if functions.foo(row[ownerEmailIndex], row[reqRoleIndex]):
-                    print("foo %s" % row[caseIndex])
             else:   # if list is empty
                 List_Cases.append([row[ownerIndex], row[ownerEmailIndex],
                                    [int(row[caseIndex])]])
+
+                if functions.RequestorRoleIsPartner(row[reqRoleIndex]):
+                    print("Role is Partner %s" % row[caseIndex])
+                    ListOfErrors.append([row[ownerIndex], row[ownerEmailIndex], CaseListErrors[DictErrors.index('ReqIsNotPart')].append([int(row[caseIndex])])])
+                if functions.foo(row[ownerEmailIndex], row[reqRoleIndex]):
+                    print("foo %s" % row[caseIndex])
+#                    ListOfErrors.append([row[ownerIndex], row[ownerEmailIndex], CaseListErrors[DictErrors.index('foo')].append([int(row[caseIndex])])])
+                    ListOfErrors.append([row[ownerIndex], row[ownerEmailIndex], CaseListErrors.append([int(row[caseIndex])])])
     finally:
         # Python closes files automatically but... what the hell
         ReportCsv.close()
 
     # print cases per Consultant!!
     printListCases()
-    # print(List_Cases)
+    print(ListOfErrors[0])
     emailToConsultant()
 
 
