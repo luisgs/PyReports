@@ -2,6 +2,7 @@ import csv
 import sys
 import os
 import sendEmail
+import functions
 
 # List_Cases = [ [ 'Luis' , 'email@email.com' , [ '123456' , '789456' ] ] ]
 List_Cases = []
@@ -50,6 +51,7 @@ def main():
             caseIndex = data[0].index('Case Number')    # caseID
             ownerIndex = data[0].index('Case Owner')    # caseOwner
             ownerEmailIndex = data[0].index('Case Owner eMail')  # ownerEmail
+            reqRoleIndex = data[0].index('Requestor Role')  # Req Role
     except (IOError):
         sys.stderr.write("ERROR: File (%s) cannot be openned\n" % sys.argv[1])
         sys.exit(1)
@@ -61,6 +63,10 @@ def main():
             if List_Cases:  # Global list HAS data
                 consultantCases(row[ownerIndex], row[ownerEmailIndex],
                                 int(row[caseIndex]))
+                if functions.RequestorRoleIsPartner(row[reqRoleIndex]):
+                    print("ROle is Partner %s" % row[caseIndex])
+                if functions.foo(row[ownerEmailIndex], row[reqRoleIndex]):
+                    print("foo %s" % row[caseIndex])
             else:   # if list is empty
                 List_Cases.append([row[ownerIndex], row[ownerEmailIndex],
                                    [int(row[caseIndex])]])
