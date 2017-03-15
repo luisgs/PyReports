@@ -8,6 +8,9 @@ variables.init()
 
 
 def emailToConsultant(employee, listCases):
+
+    sys.exit()
+
     # me == my email address
     # consultant == recipient's email address
     me = variables.emailFrom
@@ -56,6 +59,6 @@ def emailToConsultant(employee, listCases):
     s.login(variables.emailFrom, variables.password)
     # sendmail function takes 3 arguments: sender's address, recipient's address
     # and message to send - here it is sent as one string.
-#   s.sendmail(me, consultant, msg.as_string())
+    s.sendmail(me, consultant, msg.as_string())
 #   print("WE HAVE BLOCKED EMAIL TO CONSULTANT")
     s.quit()
