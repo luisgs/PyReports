@@ -32,29 +32,19 @@ def emailToConsultant():
         sendEmail.emailToConsultant(consultantReport[0], consultantReport[1])
 
 
-def consultantCases(Consultant, ConsultantEmail, CaseNumber):
-    "We will insert in Global_Cases[], consultant cases"
-    " case [0] = Consultant"
-    " case [1] = CaseNumber"
-    for i in range(len(List_Cases)):
-        if Consultant == List_Cases[i][0]:
-            List_Cases[i][2].append(CaseNumber)
-            return
-    List_Cases.append([Consultant, ConsultantEmail, [CaseNumber]])
-
-
 def insertConsultCase(Name, Email, CaseNumber, ErrorCode):
-    for i in range(len(ListOfErrors)):
-        if ListOfErrors[i][0] == Name:
+    for i in range(1,len(ListOfErrors)):
+        if (ListOfErrors[i][1] == Email):
             if CaseNumber in ListOfErrors[i][2]:
+                print(ListOfErrors[i][2])
                 # if CaseID exist, I append this new error
                 ListOfErrors[i][2][CaseNumber].append(ErrorCode)
             else:
                 # If key (CaseNumber) does not exist, I add it
-                ListOfErrors[i][2][CaseNumber] = ErrorCode
+                ListOfErrors[i][2][CaseNumber] = [ErrorCode]
             return
     # List is empty OR new consultant in list!
-    ListOfErrors[i].append([Name, Email, {CaseNumber: ErrorCode}])
+    ListOfErrors.append([Name, Email, {CaseNumber: [ErrorCode]}])
 
 
 def main():
@@ -76,28 +66,21 @@ def main():
         sys.exit(1)
     else:
         for row in data[1:-7]:  # Skip CSV header and last lines!
-            if List_Cases:  # Global list HAS data
-                consultantCases(row[ownerIndex], row[ownerEmailIndex],
-                                int(row[caseIndex]))
-            else:   # if list is empty
-                List_Cases.append([row[ownerIndex], row[ownerEmailIndex],
-                                   [int(row[caseIndex])]])
-
-                if functions.RequestorRoleIsPartner(row[reqRoleIndex]):
-                    print("Role is Partner %s" % row[caseIndex])
-                    insertConsultCase(row[caseIndex], row[ownerEmailIndex],
-                                      int(row[caseIndex]), 'RoleIsPart')
-                if functions.foo(row[ownerEmailIndex], row[reqRoleIndex]):
-                    print("foo %s" % row[caseIndex])
-                    insertConsultCase(row[caseIndex], row[ownerEmailIndex],
-                                      int(row[caseIndex]), 'foo')
+            if functions.RequestorRoleIsPartner(row[reqRoleIndex]):
+                # print("Role is Partner %s" % row[caseIndex])
+                insertConsultCase(row[ownerIndex], row[ownerEmailIndex],
+                                  int(row[caseIndex]), 'RoleIsPart')
+            if functions.foo(row[ownerEmailIndex], row[reqRoleIndex]):
+                # print("foo %s" % row[caseIndex])
+                insertConsultCase(row[ownerIndex], row[ownerEmailIndex],
+                                  int(row[caseIndex]), 'foo')
     finally:
         # Python closes files automatically but... what the hell
         ReportCsv.close()
 
     # print cases per Consultant!!
-    printListCases()
-    print(ListOfErrors[0])
+    # printListCases()
+    print(ListOfErrors)
     emailToConsultant()
 
 
