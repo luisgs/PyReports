@@ -6,6 +6,7 @@ import functions
 
 # List_Cases = [ [ 'Luis' , 'email@email.com' , [ '123456' , '789456' ] ] ]
 List_Cases = []
+ListOfErrors = []
 
 
 def consultantCases(Consultant, ConsultantEmail, CaseNumber):
@@ -42,9 +43,6 @@ def emailToConsultant():
         sendEmail.emailToConsultant(consultantReport[0], consultantReport[1])
 
 DictErrors = ['foo', 'ReqIsNotPart', 'asdf']
-CaseListErrors = [0] * 10 # len(DictErrors) 
-
-ListOfErrors = []
 
 
 def main():
@@ -58,6 +56,8 @@ def main():
             ownerIndex = data[0].index('Case Owner')    # caseOwner
             ownerEmailIndex = data[0].index('Case Owner eMail')  # ownerEmail
             reqRoleIndex = data[0].index('Requestor Role')  # Req Role
+            # CSV header and last 7 lines (garbage) are trashed
+            data = data[1:-7]
     except (IOError):
         sys.stderr.write("ERROR: File (%s) cannot be openned\n" % sys.argv[1])
         sys.exit(1)
@@ -65,7 +65,7 @@ def main():
         sys.stderr.write("ERROR: Error CSV header value is missing\n")
         sys.exit(1)
     else:
-        for row in data[1:-7]:  # Skip CSV header and last lines!
+        for row in data:  # Skip CSV header and last lines!
             if List_Cases:  # Global list HAS data
                 consultantCases(row[ownerIndex], row[ownerEmailIndex],
                                 int(row[caseIndex]))
@@ -75,11 +75,12 @@ def main():
 
                 if functions.RequestorRoleIsPartner(row[reqRoleIndex]):
                     print("Role is Partner %s" % row[caseIndex])
-                    ListOfErrors.append([row[ownerIndex], row[ownerEmailIndex], CaseListErrors[DictErrors.index('ReqIsNotPart')].append([int(row[caseIndex])])])
+                    ListOfErrors.append([row[ownerIndex], row[ownerEmailIndex],
+                                         {int(row[caseIndex]): 'RoleIsPartn'}])
                 if functions.foo(row[ownerEmailIndex], row[reqRoleIndex]):
                     print("foo %s" % row[caseIndex])
-#                    ListOfErrors.append([row[ownerIndex], row[ownerEmailIndex], CaseListErrors[DictErrors.index('foo')].append([int(row[caseIndex])])])
-                    ListOfErrors.append([row[ownerIndex], row[ownerEmailIndex], CaseListErrors.append([int(row[caseIndex])])])
+                    ListOfErrors.append([row[ownerIndex], row[ownerEmailIndex],
+                                         {int(row[caseIndex]): 'foo'}])
     finally:
         # Python closes files automatically but... what the hell
         ReportCsv.close()
