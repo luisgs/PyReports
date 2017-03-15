@@ -21,10 +21,9 @@ def doWeHaveAFile():
 
 
 def printListCases():
-    for consultantInfo in List_Cases:
+    for consultantInfo in ListOfErrors:
         print(consultantInfo[0] + " (" + consultantInfo[1] + "):")
-        for cases in consultantInfo[2]:
-            print("\t %i" % cases)
+        print(consultantInfo[2])
 
 
 def emailToConsultant():
@@ -36,7 +35,6 @@ def insertConsultCase(Name, Email, CaseNumber, ErrorCode):
     for i in range(1,len(ListOfErrors)):
         if (ListOfErrors[i][1] == Email):
             if CaseNumber in ListOfErrors[i][2]:
-                print(ListOfErrors[i][2])
                 # if CaseID exist, I append this new error
                 ListOfErrors[i][2][CaseNumber].append(ErrorCode)
             else:
@@ -79,8 +77,7 @@ def main():
         ReportCsv.close()
 
     # print cases per Consultant!!
-    # printListCases()
-    print(ListOfErrors)
+    printListCases()
     emailToConsultant()
 
 
