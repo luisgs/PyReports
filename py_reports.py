@@ -4,8 +4,7 @@ import os
 import sendEmail
 import functions
 
-# List_Cases = [ [ 'Luis' , 'email@email.com' , [ '123456' , '789456' ] ] ]
-List_Cases = []
+# ListOfErrors = ['Luis' , 'email@email.com' , {case1: ['Error1']}]
 ListOfErrors = []
 
 
@@ -27,8 +26,9 @@ def printListCases():
 
 
 def emailToConsultant():
-    for consultantReport in List_Cases:
-        sendEmail.emailToConsultant(consultantReport[0], consultantReport[1])
+    for consultantReport in ListOfErrors:
+        sendEmail.emailToConsultant(consultantReport[0], consultantReport[1], consultantReport[2])
+        break
 
 
 def insertConsultCase(Name, Email, CaseNumber, ErrorCode):

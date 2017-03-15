@@ -4,12 +4,20 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import variables
 
+# We bring into our lib global variables such as passwords, emails...
 variables.init()
 
 
-def emailToConsultant(employee, listCases):
+def listConsulCases (dictCases):
+    htmlCases = ""
+    for case in dictCases:
+        # <a href="http://www.yahoo.com">here</a>
+        htmlCases += '  <a href=\"http://www.yahoo.com\">' + str(case) + "</a>:<br>"
+        for Errors in dictCases[case]:
+            htmlCases += '<p class=\"tab\">- ' + Errors + "</p><br>"
+    return htmlCases
 
-    sys.exit()
+def emailToConsultant(employee, email, listCases):
 
     # me == my email address
     # consultant == recipient's email address
@@ -22,10 +30,6 @@ def emailToConsultant(employee, listCases):
     msg['From'] = me
     msg['To'] = consultant
 
-    htmlCases = ""
-    for case in listCases:
-        htmlCases = htmlCases + str(case) + "\n"
-
     # Create the body of the message (a plain-text and an HTML version).
     text = 'Hi!\nHow are you?\nWe need you to correct some cases\n \
         Please open a html version that has been sent with this email for \
@@ -34,14 +38,20 @@ def emailToConsultant(employee, listCases):
     <html>
     <head></head>
     <body>
+        <style type="text/css">
+        <!--
+        .tab { margin-left: 40px; }
+        -->
+        </style>
+
         <p>Hi """ + employee + """!<br>
         How are you?<br>
-        We need you to correct these cases below: \n""" + htmlCases + """
+        We need you to correct these cases below: <br>""" + listConsulCases(listCases) + """
         </p>
     </body>
     </html>
     """
-#    print(html)
+    print(html)
     # Record the MIME types of both parts - text/plain and text/html.
     part1 = MIMEText(text, 'plain')
     part2 = MIMEText(html, 'html')
@@ -59,6 +69,5 @@ def emailToConsultant(employee, listCases):
     s.login(variables.emailFrom, variables.password)
     # sendmail function takes 3 arguments: sender's address, recipient's address
     # and message to send - here it is sent as one string.
-    s.sendmail(me, consultant, msg.as_string())
-#   print("WE HAVE BLOCKED EMAIL TO CONSULTANT")
+    # s.sendmail(me, consultant, msg.as_string())
     s.quit()
