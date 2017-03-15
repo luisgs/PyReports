@@ -28,7 +28,6 @@ def printListCases():
 def emailToConsultant():
     for consultantReport in ListOfErrors:
         sendEmail.emailToConsultant(consultantReport[0], consultantReport[1], consultantReport[2])
-        break
 
 
 def insertConsultCase(Name, Email, CaseNumber, ErrorCode):
