@@ -59,15 +59,18 @@ def main():
             # We read CSV header!
             # Specific Index values for reports
             if 'Asset Location: Primary' in data[0]:
-                print(sys.argv[1])
                 reportNumber = 1
                 asLocPrimary = data[0].index('Asset Location: Primary')
+                asLocStatus = data[0].index('Asset Location: Location Status')
+                countrySub = data[0].index('Country of Submitter')
+                asCountryLoc = data[0].index('Asset Location: Country')
             else:
                 reportNumber = 2
             # Common Index Values for all types reports
             ownerEmailIndex = data[0].index('Case Owner eMail')
             caseIndex = data[0].index('Case Number')    # caseID
             ownerIndex = data[0].index('Case Owner')
+            reqEmailIndex = data[0].index('Case Requestor Email')
             reqRoleIndex = data[0].index('Requestor Role')  # Req Role
     except (IOError):
         sys.stderr.write("ERROR: File (%s) cannot be openned\n" % sys.argv[1])
@@ -78,23 +81,31 @@ def main():
     else:
         if reportNumber == 1:
             for row in data[1:-7]:  # Skip CSV header and last lines!
-                if functions.IsLocationPrimary(row[asLocPrimary]):
+                if not functions.IsLocationPrimary(row[asLocPrimary]):
                     insertConsultCase(row[ownerIndex], row[ownerEmailIndex],
                                       int(row[caseIndex]), 'LocationNotPrimary')
-
-                if functions.emailReqContains(row[ownerEmailIndex]):
+                if functions.emailReqContains(row[reqEmailIndex]):
                     insertConsultCase(row[ownerIndex], row[ownerEmailIndex],
-                                      int(row[caseIndex]), 'Requestor hpe.am')
+                                      int(row[caseIndex]), 'Requestor email ends hpe.com')
+                if not functions.caseRoleIsPartner(row[reqRoleIndex]):
+                    insertConsultCase(row[ownerIndex], row[ownerEmailIndex],
+                                      int(row[caseIndex]), 'Role Is not Partner. Change it!')
+                if not functions.isLocationStatus(row[asLocStatus]):
+                    insertConsultCase(row[ownerIndex], row[ownerEmailIndex],
+                                      int(row[caseIndex]), 'LocationStatusIs DISABLE')
+                if not functions.countrySubLocEqual(row[countrySub], row[asCountryLoc]):
+                    insertConsultCase(row[ownerIndex], row[ownerEmailIndex],
+                                      int(row[caseIndex]), 'Countries does NOT match')
         elif reportNumber == 2:
             for row in data[1:-7]:  # Skip CSV header and last lines!
-                if functions.RequestorRoleIsPartner(row[reqRoleIndex]):
+                if functions.RequestorRoleIsPartner(row[reqEmailIndex], row[reqRoleIndex]):
                     # print("Role is Partner %s" % row[caseIndex])
                     insertConsultCase(row[ownerIndex], row[ownerEmailIndex],
-                                      int(row[caseIndex]), 'RoleIsPart')
-                if functions.foo(row[ownerEmailIndex], row[reqRoleIndex]):
+                                      int(row[caseIndex]), 'Role Is Partner. Change it!')
+                if functions.partnerInList(row[reqEmailIndex], row[reqRoleIndex]):
                     # print("foo %s" % row[caseIndex])
                     insertConsultCase(row[ownerIndex], row[ownerEmailIndex],
-                                      int(row[caseIndex]), 'foo')
+                                      int(row[caseIndex]), 'Requestor is NOT HPE!')
     finally:
         # Python closes files automatically but... what the hell
         ReportCsv.close()

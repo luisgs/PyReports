@@ -1,4 +1,8 @@
-def RequestorRoleIsPartner(requestorRole):
+def RequestorRoleIsPartner(Email, requestorRole):
+    return ((requestorRole == 'Partner') and ("hpe.com" in Email))
+
+
+def caseRoleIsPartner(requestorRole):
     return (requestorRole == 'Partner')
 
 
@@ -7,7 +11,7 @@ def IsLocationPrimary(assetLocPrimary):
 
 
 def partnerInList(Email, Role):
-    return ((not ("@hpe.com" in Email)) and (Role == "HPE Internal"))
+    return ((not ("@hpe.com" in Email)) and (Role != "Non HPE Partner"))
 
 
 def assetLocationStatus(status):
@@ -22,10 +26,6 @@ def sourceIDstart1(accID):
     return (accID[0] == '1')
 
 
-def countrySubLoc(submitter, location):
-    return (submitter == location)
-
-
 def emailReqContains(email):
     return ("hpe.com" in email[-7:])
 
@@ -36,6 +36,5 @@ def isLocationStatus(location):
 
 def countrySubLocEqual(cSub, aLocation):
     if aLocation == "Russian Federation":
-        print(cSub[:6])
         return cSub[:6] == "Russia"
     return cSub == aLocation
