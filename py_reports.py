@@ -36,18 +36,29 @@ def emailToConsultant():
         break
 
 
+ErrorsDefinition = {"LocationNotPrimary": "Case Location is NOT primary",
+                    "ReqEndHPE": "Requestor Email ends with @hpe.com",
+                    "RoleIsNotPartner": "Requestor Role needs to be " +
+                    "change to Partner",
+                    "LocStatusDisable": "Assest Location Status " +
+                    "is ser to Disable",
+                    "countrySubLoc": "Country Submitter and " +
+                    "Asset Country Location does NOT match",
+                    "ReqIsNotHPE": "Requestor Role needs to be HPE"}
+
+
 def insertConsultCase(Name, Email, CaseNumber, ErrorCode):
     for i in range(1, len(ListOfErrors)):
         if (ListOfErrors[i][1] == Email):
             if CaseNumber in ListOfErrors[i][2]:
                 # if CaseID exist, I append this new error
-                ListOfErrors[i][2][CaseNumber].append(ErrorCode)
+                ListOfErrors[i][2][CaseNumber].append(ErrorsDefinition[ErrorCode])
             else:
                 # If key (CaseNumber) does not exist, I add it
-                ListOfErrors[i][2][CaseNumber] = [ErrorCode]
+                ListOfErrors[i][2][CaseNumber] = [ErrorsDefinition[ErrorCode]]
             return
     # List is empty OR new consultant in list!
-    ListOfErrors.append([Name, Email, {CaseNumber: [ErrorCode]}])
+    ListOfErrors.append([Name, Email, {CaseNumber: [ErrorsDefinition[ErrorCode]]}])
 
 
 def main():
@@ -86,26 +97,26 @@ def main():
                                       int(row[caseIndex]), 'LocationNotPrimary')
                 if functions.emailReqContains(row[reqEmailIndex]):
                     insertConsultCase(row[ownerIndex], row[ownerEmailIndex],
-                                      int(row[caseIndex]), 'Requestor email ends hpe.com')
+                                      int(row[caseIndex]), 'ReqEndHPE')
                 if not functions.caseRoleIsPartner(row[reqRoleIndex]):
                     insertConsultCase(row[ownerIndex], row[ownerEmailIndex],
-                                      int(row[caseIndex]), 'Role Is not Partner. Change it!')
+                                      int(row[caseIndex]), 'RoleIsNotPartner')
                 if not functions.isLocationStatus(row[asLocStatus]):
                     insertConsultCase(row[ownerIndex], row[ownerEmailIndex],
-                                      int(row[caseIndex]), 'LocationStatusIs DISABLE')
+                                      int(row[caseIndex]), 'LocStatusDisable')
                 if not functions.countrySubLocEqual(row[countrySub], row[asCountryLoc]):
                     insertConsultCase(row[ownerIndex], row[ownerEmailIndex],
-                                      int(row[caseIndex]), 'Countries does NOT match')
+                                      int(row[caseIndex]), 'countrySubLoc')
         elif reportNumber == 2:
             for row in data[1:-7]:  # Skip CSV header and last lines!
                 if functions.RequestorRoleIsPartner(row[reqEmailIndex], row[reqRoleIndex]):
                     # print("Role is Partner %s" % row[caseIndex])
                     insertConsultCase(row[ownerIndex], row[ownerEmailIndex],
-                                      int(row[caseIndex]), 'Role Is Partner. Change it!')
+                                      int(row[caseIndex]), 'RoleIsNotPartner')
                 if functions.partnerInList(row[reqEmailIndex], row[reqRoleIndex]):
                     # print("foo %s" % row[caseIndex])
                     insertConsultCase(row[ownerIndex], row[ownerEmailIndex],
-                                      int(row[caseIndex]), 'Requestor is NOT HPE!')
+                                      int(row[caseIndex]), 'ReqIsNotHPE')
     finally:
         # Python closes files automatically but... what the hell
         ReportCsv.close()
