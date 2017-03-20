@@ -1,5 +1,4 @@
 import smtplib
-import sys
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import variables
@@ -8,17 +7,19 @@ import variables
 variables.init()
 
 
-def listConsulCases (dictCases):
+def listConsulCases(dictCases):
     htmlCases = ""
+    href = 'https://hp.my.salesforce.com/_ui/search/ui/UnifiedSearchResults?searchType=2&sen=500&sen=00O&str='
     for case in dictCases:
         # <a href="http://www.yahoo.com">here</a>
-        htmlCases += '  <a href=\"http://www.yahoo.com\">' + str(case) + "</a>:<br>"
+        htmlCases += '<dl><dt><a href=\"' + href + str(case) + '\">' + \
+                str(case) + "</a>:</dt><br>"
         for Errors in dictCases[case]:
-            htmlCases += '<p class=\"tab\">- ' + Errors + "</p><br>"
-    return htmlCases
+            htmlCases += '<dd>- ' + Errors + "</dd><br>"
+    return htmlCases+"</dt>"
+
 
 def emailToConsultant(employee, email, listCases):
-
     # me == my email address
     # consultant == recipient's email address
     me = variables.emailFrom
@@ -31,25 +32,23 @@ def emailToConsultant(employee, email, listCases):
     msg['To'] = consultant
 
     # Create the body of the message (a plain-text and an HTML version).
-    text = 'Hi!\nHow are you?\nWe need you to correct some cases\n \
+    text = 'Hi!\nHow are you?\nWe need you to correct some cases\n\n \
         Please open a html version that has been sent with this email for \
         further details'
     html = """\
-    <html>
-    <head></head>
-    <body>
-        <style type="text/css">
-        <!--
-        .tab { margin-left: 40px; }
-        -->
-        </style>
+<html>
+<head></head>
+<body>
 
-        <p>Hi """ + employee + """!<br>
-        How are you?<br>
-        We need you to correct these cases below: <br>""" + listConsulCases(listCases) + """
-        </p>
-    </body>
-    </html>
+    <p>Hi """ + employee.partition(' ')[0] + """!<br> <br>
+
+    How are you?<br>
+    We need you to correct these cases below: <br>""" \
+        + listConsulCases(listCases) + """
+    </p>
+Thank you!
+</body>
+</html>
     """
     print(html)
     # Record the MIME types of both parts - text/plain and text/html.
