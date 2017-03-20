@@ -6,8 +6,8 @@ def IsLocationPrimary(assetLocPrimary):
     return int(assetLocPrimary)
 
 
-def foo(Email, Role):
-    return (Email.find('@hpe.com') and (Role is not 'Non HPE Partner'))
+def partnerInList(Email, Role):
+    return ((not ("@hpe.com" in Email)) and (Role == "HPE Internal"))
 
 
 def assetLocationStatus(status):
@@ -27,4 +27,15 @@ def countrySubLoc(submitter, location):
 
 
 def emailReqContains(email):
-    return ("hpe.com.am" in email)
+    return ("hpe.com" in email[-7:])
+
+
+def isLocationStatus(location):
+    return location == "Active"
+
+
+def countrySubLocEqual(cSub, aLocation):
+    if aLocation == "Russian Federation":
+        print(cSub[:6])
+        return cSub[:6] == "Russia"
+    return cSub == aLocation
