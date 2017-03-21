@@ -12,11 +12,12 @@ def listConsulCases(dictCases):
     href = 'https://hp.my.salesforce.com/_ui/search/ui/UnifiedSearchResults?searchType=2&sen=500&sen=00O&str='
     for case in dictCases:
         # <a href="http://www.yahoo.com">here</a>
-        htmlCases += '<dl><dt><a href=\"' + href + str(case) + '\">' + \
-                str(case) + "</a>:</dt><br>"
-        for Errors in dictCases[case]:
-            htmlCases += '<dd>- ' + Errors + "</dd><br>"
-    return htmlCases+"</dt>"
+        listErrors = [('<dd>- %s </dd><br>' %
+                       (Error)) for Error in dictCases[case]]
+        htmlCases = ('%s<dl><dt><a href=\"%s%s\">%s</a>:</dt><br>%s' %
+                     (htmlCases, href, str(case),
+                      str(case), "".join(listErrors)))
+    return "%s</dt>" % (htmlCases)
 
 
 def emailToConsultant(employee, email, listCases):
@@ -40,16 +41,16 @@ def emailToConsultant(employee, email, listCases):
 <head></head>
 <body>
 
-    <p>Hi """ + employee.partition(' ')[0] + """!<br> <br>
+    <p>Hi %s!<br> <br>
 
     How are you?<br>
-    We need you to correct these cases below: <br>""" \
-        + listConsulCases(listCases) + """
+    We need you to correct these cases below: <br>
+    %s
     </p>
 Thank you!
 </body>
 </html>
-    """
+    """ % (employee.partition(' ')[0], listConsulCases(listCases))
     print(html)
     # Record the MIME types of both parts - text/plain and text/html.
     part1 = MIMEText(text, 'plain')

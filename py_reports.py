@@ -30,10 +30,10 @@ def printListCases():
 
 
 def emailToConsultant():
-    for consultantReport in ListOfErrors:
-        sendEmail.emailToConsultant(consultantReport[0],
-                                    consultantReport[1], consultantReport[2])
-        break
+    [sendEmail.emailToConsultant(consultantReport[0],
+                                 consultantReport[1],
+                                 consultantReport[2]) for
+     consultantReport in ListOfErrors]
 
 
 ErrorsDefinition = {"LocationNotPrimary": "Case Location is NOT primary",
@@ -48,7 +48,7 @@ ErrorsDefinition = {"LocationNotPrimary": "Case Location is NOT primary",
 
 
 def insertConsultCase(Name, Email, CaseNumber, ErrorCode):
-    for i in range(1, len(ListOfErrors)):
+    for i in range(len(ListOfErrors)):
         if (ListOfErrors[i][1] == Email):
             if CaseNumber in ListOfErrors[i][2]:
                 # if CaseID exist, I append this new error
@@ -122,7 +122,7 @@ def main():
         ReportCsv.close()
     # print cases per Consultant!!
     printListCases()
-#    emailToConsultant()
+    emailToConsultant()
 
 
 if __name__ == "__main__":
