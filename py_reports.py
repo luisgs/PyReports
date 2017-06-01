@@ -1,6 +1,7 @@
 import csv
 import sys
 import os
+import re
 import sendEmail
 import codecs
 import functions
@@ -79,12 +80,32 @@ def whichReportIsIt(CSVfield):
     return "Unknown"
 
 
-def missOppId_function(data, Subject, Description, OwnerEmail,
-                       CaseID, OwnerName):
+dictCasesOPP = {}
+
+
+def missOppId_function(data, CaseID, OwnerEmail, OwnerName, Description,
+                       Subject):
     for row in data:
         insertConsultCase(row[OwnerName], row[OwnerEmail],
                           int(row[CaseID]), 'missOPPID')
+        # look for a OppID in text
+        oppID = returnOPPID(row[Description])
+
+        if not oppID:
+            oppID = returnOPPID(row[Subject])
+        # In case of Subject or Description have it, insert it!
+        if oppID:
+            dictCasesOPP.update({row[CaseID]: oppID})
     return 1
+
+
+def returnOPPID(text):
+    oppID = 0
+    match = re.search(r"\d{10}", text)
+    # If-statement after search() tests if it succeeded
+    if match:
+        oppID = match.group(0)
+    return oppID
 
 
 def main():
@@ -131,8 +152,8 @@ def main():
         ReportCsv.close()
 
     if ("missOPPID" in reportName):
-        missOppId_function(data[1:-7], emailSubject, emailDescription,
-                            ownerEmailIndex, caseIndex, ownerName)
+        missOppId_function(data[1:-7], caseIndex, ownerEmailIndex, ownerName,
+                           emailDescription, emailSubject)
     elif ("PPID bad" in reportName):
         for row in data[1:-7]:  # Skip CSV header and last lines!
             if not functions.IsLocationPrimary(row[asLocPrimary]):
@@ -152,6 +173,7 @@ def main():
                 insertConsultCase(row[ownerName], row[ownerEmailIndex],
                                     int(row[caseIndex]), 'countrySubLoc')
     elif ("PPID miss" in reportName):
+        # ppidMiss_function(data[1:-7], caseIndex, ownerEmailIndex, ownerName
         for row in data[1:-7]:  # Skip CSV header and last lines!
             if not functions.RequestorRoleIsPartner(row[reqEmailIndex],
                                                 row[reqRoleIndex]):
