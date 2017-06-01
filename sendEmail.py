@@ -31,6 +31,8 @@ def emailToConsultant(employee, email, listCases):
     msg['Subject'] = "Please, some of your cases need corrections"
     msg['From'] = me
     msg['To'] = consultant
+    msg['Cc'] = ""
+    msg['Bc'] = ""
 
     # Create the body of the message (a plain-text and an HTML version).
     text = 'Hi!\nHow are you?\nWe need you to correct some cases\n\n \
@@ -69,5 +71,6 @@ Thank you!
     s.login(variables.emailFrom, variables.password)
     # sendmail function takes 3 arguments: sender's address, recipient's address
     # and message to send - here it is sent as one string.
-    # s.sendmail(me, consultant, msg.as_string())
+    consultant = "luis.gomez@hpe.com"
+    s.sendmail(me, consultant, msg.as_string())
     s.quit()

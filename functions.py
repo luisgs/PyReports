@@ -1,9 +1,16 @@
 def RequestorRoleIsPartner(Email, requestorRole):
-    return ((requestorRole == 'Partner') and ("hpe.com" in Email))
+    if ("Partner" in requestorRole):
+        return True
+    return False
 
 
 def caseRoleIsPartner(requestorRole):
     return (requestorRole == 'Partner')
+
+
+def BUisMissing(BU):
+    print(BU)
+    return (BU)
 
 
 def IsLocationPrimary(assetLocPrimary):

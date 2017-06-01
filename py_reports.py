@@ -5,7 +5,7 @@ import sendEmail
 import codecs
 import functions
 
-# ListOfErrors = ['Luis' , 'email@email.com' , {case1: ['Error1']}]
+# ListOfErrors = ['Luis' , 'luis@email.com' , {case1: ['Error1']}]
 ListOfErrors = []
 
 
@@ -41,10 +41,14 @@ ErrorsDefinition = {"LocationNotPrimary": "Case Location is NOT primary",
                     "RoleIsNotPartner": "Requestor Role needs to be " +
                     "change to Partner",
                     "LocStatusDisable": "Assest Location Status " +
-                    "is ser to Disable",
+                    "is set to Disable",
                     "countrySubLoc": "Country Submitter and " +
                     "Asset Country Location does NOT match",
-                    "ReqIsNotHPE": "Requestor Role needs to be HPE"}
+                    "BUisMissing": "BU is empty",
+                    "PPIDmiss": "This case has not Asset Location",
+                    "ReqIsNotHPE": "Requestor Role needs to be HPE",
+                    "missOPPID": "Opportunity ID provided but not " +
+                    "fulfilled in the case."}
 
 
 def insertConsultCase(Name, Email, CaseNumber, ErrorCode):
@@ -58,7 +62,29 @@ def insertConsultCase(Name, Email, CaseNumber, ErrorCode):
                 ListOfErrors[i][2][CaseNumber] = [ErrorsDefinition[ErrorCode]]
             return
     # List is empty OR new consultant in list!
-    ListOfErrors.append([Name, Email, {CaseNumber: [ErrorsDefinition[ErrorCode]]}])
+    ListOfErrors.append([Name, Email,
+                         {CaseNumber: [ErrorsDefinition[ErrorCode]]}])
+
+
+ListOfReports = ["missOPPID", "PPID miss", "PPID bad"]
+
+
+def whichReportIsIt(CSVfield):
+    # We received a string from a csv file that contains CSV report's name
+    # we return which tpye of report we are working on
+    for i in range(len(ListOfReports)):
+        if ListOfReports[i] in CSVfield:
+            return ListOfReports[i]
+    # eoc -> unknown report!
+    return "Unknown"
+
+
+def missOppId_function(data, Subject, Description, OwnerEmail,
+                       CaseID, OwnerName):
+    for row in data:
+        insertConsultCase(row[OwnerName], row[OwnerEmail],
+                          int(row[CaseID]), 'missOPPID')
+    return 1
 
 
 def main():
@@ -67,62 +93,84 @@ def main():
         with codecs.open(sys.argv[1], 'r', 'iso-8859-1') as ReportCsv:
             reader = csv.reader(ReportCsv)
             data = list(reader)
+            # with which report are we working on?
+            # report definition is set at the bottom of the file
+            reportName = whichReportIsIt(data[-5][0])
+            print(reportName)
+            if ("Unknown" in reportName):
+                sys.stderr.write("ERROR: This report file has not been recognize\n")
+                sys.exit(1)
             # We read CSV header!
             # Specific Index values for reports
-            if 'Asset Location: Primary' in data[0]:
-                reportNumber = 1
+            # Common Index Values for all type of reports
+            ownerEmailIndex = data[0].index('Case Owner eMail')
+            caseIndex = data[0].index('Case Number')    # caseID
+            ownerName = data[0].index('Case Owner')
+            if ("PPID bad" in reportName):
                 asLocPrimary = data[0].index('Asset Location: Primary')
                 asLocStatus = data[0].index('Asset Location: Location Status')
                 countrySub = data[0].index('Country of Submitter')
+                reqRoleIndex = data[0].index('Requestor Role')  # Req Role
                 asCountryLoc = data[0].index('Asset Location: Country')
-            else:
-                reportNumber = 2
-            # Common Index Values for all types reports
-            ownerEmailIndex = data[0].index('Case Owner eMail')
-            caseIndex = data[0].index('Case Number')    # caseID
-            ownerIndex = data[0].index('Case Owner')
-            reqEmailIndex = data[0].index('Case Requestor Email')
-            reqRoleIndex = data[0].index('Requestor Role')  # Req Role
+                reqEmailIndex = data[0].index('Case Requestor Email')
+            elif ("PPID miss" in reportName):
+                reqRoleIndex = data[0].index('Requestor Role')  # Req Role
+                caseBU = data[0].index('BU')
+                reqEmailIndex = data[0].index('Case Requestor Email')
+            elif ("missOPPID" in reportName):
+                emailSubject = data[0].index('Subject')
+                emailDescription = data[0].index('Case description')
     except (IOError):
         sys.stderr.write("ERROR: File (%s) cannot be openned\n" % sys.argv[1])
         sys.exit(1)
     except ValueError:
         sys.stderr.write("ERROR: Error CSV header value is missing\n")
         sys.exit(1)
-    else:
-        if reportNumber == 1:
-            for row in data[1:-7]:  # Skip CSV header and last lines!
-                if not functions.IsLocationPrimary(row[asLocPrimary]):
-                    insertConsultCase(row[ownerIndex], row[ownerEmailIndex],
-                                      int(row[caseIndex]), 'LocationNotPrimary')
-                if functions.emailReqContains(row[reqEmailIndex]):
-                    insertConsultCase(row[ownerIndex], row[ownerEmailIndex],
-                                      int(row[caseIndex]), 'ReqEndHPE')
-                if not functions.caseRoleIsPartner(row[reqRoleIndex]):
-                    insertConsultCase(row[ownerIndex], row[ownerEmailIndex],
-                                      int(row[caseIndex]), 'RoleIsNotPartner')
-                if not functions.isLocationStatus(row[asLocStatus]):
-                    insertConsultCase(row[ownerIndex], row[ownerEmailIndex],
-                                      int(row[caseIndex]), 'LocStatusDisable')
-                if not functions.countrySubLocEqual(row[countrySub], row[asCountryLoc]):
-                    insertConsultCase(row[ownerIndex], row[ownerEmailIndex],
-                                      int(row[caseIndex]), 'countrySubLoc')
-        elif reportNumber == 2:
-            for row in data[1:-7]:  # Skip CSV header and last lines!
-                if functions.RequestorRoleIsPartner(row[reqEmailIndex], row[reqRoleIndex]):
-                    # print("Role is Partner %s" % row[caseIndex])
-                    insertConsultCase(row[ownerIndex], row[ownerEmailIndex],
-                                      int(row[caseIndex]), 'RoleIsNotPartner')
-                if functions.partnerInList(row[reqEmailIndex], row[reqRoleIndex]):
-                    # print("foo %s" % row[caseIndex])
-                    insertConsultCase(row[ownerIndex], row[ownerEmailIndex],
-                                      int(row[caseIndex]), 'ReqIsNotHPE')
     finally:
         # Python closes files automatically but... what the hell
         ReportCsv.close()
+
+    if ("missOPPID" in reportName):
+        missOppId_function(data[1:-7], emailSubject, emailDescription,
+                            ownerEmailIndex, caseIndex, ownerName)
+    elif ("PPID bad" in reportName):
+        for row in data[1:-7]:  # Skip CSV header and last lines!
+            if not functions.IsLocationPrimary(row[asLocPrimary]):
+                insertConsultCase(row[ownerName], row[ownerEmailIndex],
+                                    int(row[caseIndex]), 'LocationNotPrimary')
+            if functions.emailReqContains(row[reqEmailIndex]):
+                insertConsultCase(row[ownerName], row[ownerEmailIndex],
+                                    int(row[caseIndex]), 'ReqEndHPE')
+            if not functions.caseRoleIsPartner(row[reqRoleIndex]):
+                insertConsultCase(row[ownerName], row[ownerEmailIndex],
+                                    int(row[caseIndex]), 'RoleIsNotPartner')
+            if not functions.isLocationStatus(row[asLocStatus]):
+                insertConsultCase(row[ownerName], row[ownerEmailIndex],
+                                    int(row[caseIndex]), 'LocStatusDisable')
+            if not functions.countrySubLocEqual(row[countrySub],
+                                                row[asCountryLoc]):
+                insertConsultCase(row[ownerName], row[ownerEmailIndex],
+                                    int(row[caseIndex]), 'countrySubLoc')
+    elif ("PPID miss" in reportName):
+        for row in data[1:-7]:  # Skip CSV header and last lines!
+            if not functions.RequestorRoleIsPartner(row[reqEmailIndex],
+                                                row[reqRoleIndex]):
+                insertConsultCase(row[ownerName], row[ownerEmailIndex],
+                                    int(row[caseIndex]), 'RoleIsNotPartner')
+            if functions.BUisMissing(caseBU):
+                insertConsultCase(row[ownerName], row[ownerEmailIndex],
+                                    int(row[caseIndex]), 'BUisMissing')
+#            if functions.partnerInList(row[reqEmailIndex],
+#                                        row[reqRoleIndex]):
+                # print("foo %s" % row[caseIndex])
+#                insertConsultCase(row[ownerName], row[ownerEmailIndex],
+#                                    int(row[caseIndex]), 'ReqIsNotHPE')
+            # All these cases do NOT have Asset Location ID
+            insertConsultCase(row[ownerName], row[ownerEmailIndex],
+                                int(row[caseIndex]), 'PPIDmiss')
     # print cases per Consultant!!
     printListCases()
-    emailToConsultant()
+    # emailToConsultant()
 
 
 if __name__ == "__main__":
