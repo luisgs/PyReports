@@ -9,8 +9,8 @@ def caseRoleIsPartner(requestorRole):
 
 
 def BUisMissing(BU):
-    print(BU)
-    return (BU)
+    # if BU empty, then return not Flase = True = missing!
+    return not BU
 
 
 def IsLocationPrimary(assetLocPrimary):

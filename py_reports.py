@@ -44,7 +44,7 @@ ErrorsDefinition = {"LocationNotPrimary": "Case Location is NOT primary",
                     "is set to Disable",
                     "countrySubLoc": "Country Submitter and " +
                     "Asset Country Location does NOT match",
-                    "BUisMissing": "BU is empty",
+                    "BUisMissing": "BU is empty, complete it!",
                     "PPIDmiss": "This case has not Asset Location",
                     "ReqIsNotHPE": "Requestor Role needs to be HPE",
                     "missOPPID": "Opportunity ID provided but not " +
@@ -157,7 +157,7 @@ def main():
                                                 row[reqRoleIndex]):
                 insertConsultCase(row[ownerName], row[ownerEmailIndex],
                                     int(row[caseIndex]), 'RoleIsNotPartner')
-            if functions.BUisMissing(caseBU):
+            if functions.BUisMissing(row[caseBU]):
                 insertConsultCase(row[ownerName], row[ownerEmailIndex],
                                     int(row[caseIndex]), 'BUisMissing')
 #            if functions.partnerInList(row[reqEmailIndex],
