@@ -127,7 +127,7 @@ def main():
         sys.stderr.write("ERROR: Error CSV header value is missing\n")
         sys.exit(1)
     finally:
-        # Python closes files automatically but... what the hell
+        # Python closes files automatically but... what the hell!
         ReportCsv.close()
 
     if ("missOPPID" in reportName):
@@ -174,4 +174,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
