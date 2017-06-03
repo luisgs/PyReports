@@ -5,10 +5,13 @@ import re
 import sendEmail
 import codecs
 import functions
+import globalVariables
 
-# ListOfErrors = ['Luis' , 'luis@email.com' , {case1: ['Error1']}]
+# ListOfErrors = ['Luis' , 'luis@email.com' , {case1: [ErrorCode]}]
 ListOfErrors = []
 
+# Dict of {case: Suggested OppID}
+dictCasesOPP = {}
 
 def doWeHaveAFile():
     "We have a file as arg that exist and it is readable"
@@ -27,7 +30,10 @@ def printListCases():
         for case in consultantInfo[2]:
             print("\t"+str(case))
             for Error in consultantInfo[2][case]:
-                print("\t\t"+str(Error))
+                print("\t\t"+str(ErrorsDefinition[Error]))
+                if ((Error == "missOPPID") and (str(case) in dictCasesOPP)):
+                    print("\t\t\t Our suggestion is to write: " +
+                          str(dictCasesOPP[str(case)]))
 
 
 def emailToConsultant():
@@ -37,19 +43,8 @@ def emailToConsultant():
      consultantReport in ListOfErrors]
 
 
-ErrorsDefinition = {"LocationNotPrimary": "Case Location is NOT primary",
-                    "ReqEndHPE": "Requestor Email ends with @hpe.com",
-                    "RoleIsNotPartner": "Requestor Role needs to be " +
-                    "change to Partner",
-                    "LocStatusDisable": "Assest Location Status " +
-                    "is set to Disable",
-                    "countrySubLoc": "Country Submitter and " +
-                    "Asset Country Location does NOT match",
-                    "BUisMissing": "BU is empty, complete it!",
-                    "PPIDmiss": "This case has not Asset Location",
-                    "ReqIsNotHPE": "Requestor Role needs to be HPE",
-                    "missOPPID": "Opportunity ID provided but not " +
-                    "fulfilled in the case."}
+
+ErrorsDefinition = globalVariables.ErrorsDefinition
 
 
 def insertConsultCase(Name, Email, CaseNumber, ErrorCode):
@@ -57,14 +52,17 @@ def insertConsultCase(Name, Email, CaseNumber, ErrorCode):
         if (ListOfErrors[i][1] == Email):
             if CaseNumber in ListOfErrors[i][2]:
                 # if CaseID exist, I append this new error
-                ListOfErrors[i][2][CaseNumber].append(ErrorsDefinition[ErrorCode])
+                # ListOfErrors[i][2][CaseNumber].append(ErrorsDefinition[ErrorCode])
+                ListOfErrors[i][2][CaseNumber].append(ErrorCode)
             else:
                 # If key (CaseNumber) does not exist, I add it
-                ListOfErrors[i][2][CaseNumber] = [ErrorsDefinition[ErrorCode]]
-            return
+                # ListOfErrors[i][2][CaseNumber] = [ErrorsDefinition[ErrorCode]]
+                ListOfErrors[i][2][CaseNumber] = [ErrorCode]
+                return
     # List is empty OR new consultant in list!
     ListOfErrors.append([Name, Email,
-                         {CaseNumber: [ErrorsDefinition[ErrorCode]]}])
+                         {CaseNumber: [ErrorCode]}])
+                         # {CaseNumber: [ErrorsDefinition[ErrorCode]]}])
 
 
 ListOfReports = ["missOPPID", "PPID miss", "PPID bad"]
@@ -79,8 +77,6 @@ def whichReportIsIt(CSVfield):
     # eoc -> unknown report!
     return "Unknown"
 
-
-dictCasesOPP = {}
 
 
 def missOppId_function(data, CaseID, OwnerEmail, OwnerName, Description,
@@ -106,6 +102,7 @@ def returnOPPID(text):
     if match:
         oppID = match.group(0)
     return oppID
+
 
 
 def main():
@@ -182,6 +179,9 @@ def main():
             if functions.BUisMissing(row[caseBU]):
                 insertConsultCase(row[ownerName], row[ownerEmailIndex],
                                     int(row[caseIndex]), 'BUisMissing')
+            if functions.emailReqContains(row[reqEmailIndex]):
+                insertConsultCase(row[ownerName], row[ownerEmailIndex],
+                                    int(row[caseIndex]), "ReqEndHPE")
 #            if functions.partnerInList(row[reqEmailIndex],
 #                                        row[reqRoleIndex]):
                 # print("foo %s" % row[caseIndex])
