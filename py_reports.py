@@ -7,11 +7,22 @@ import codecs
 import functions
 import globalVariables
 
+
 # ListOfErrors = ['Luis' , 'luis@email.com' , {case1: [ErrorCode]}]
 ListOfErrors = []
 
+
 # Dict of {case: Suggested OppID}
 dictCasesOPP = {}
+
+
+# we bring our dict  of errors
+ErrorsDefinition = globalVariables.ErrorsDefinition
+
+
+# Which types of reports we have?
+ListOfReports = ["missOPPID", "PPID miss", "PPID bad"]
+
 
 def doWeHaveAFile():
     "We have a file as arg that exist and it is readable"
@@ -43,10 +54,6 @@ def emailToConsultant():
      consultantReport in ListOfErrors]
 
 
-
-ErrorsDefinition = globalVariables.ErrorsDefinition
-
-
 def insertConsultCase(Name, Email, CaseNumber, ErrorCode):
     for i in range(len(ListOfErrors)):
         if (ListOfErrors[i][1] == Email):
@@ -62,10 +69,6 @@ def insertConsultCase(Name, Email, CaseNumber, ErrorCode):
     # List is empty OR new consultant in list!
     ListOfErrors.append([Name, Email,
                          {CaseNumber: [ErrorCode]}])
-                         # {CaseNumber: [ErrorsDefinition[ErrorCode]]}])
-
-
-ListOfReports = ["missOPPID", "PPID miss", "PPID bad"]
 
 
 def whichReportIsIt(CSVfield):
@@ -76,7 +79,6 @@ def whichReportIsIt(CSVfield):
             return ListOfReports[i]
     # eoc -> unknown report!
     return "Unknown"
-
 
 
 def missOppId_function(data, CaseID, OwnerEmail, OwnerName, Description,
@@ -103,6 +105,35 @@ def returnOPPID(text):
         oppID = match.group(0)
     return oppID
 
+
+reportsIndexesDict = {}
+
+
+#def retreivingFileIndexes(fileheader):
+    # WE receive a CSV header and we take header indexes for our reports
+    # We read CSV header!
+    # Specific Index values for reports
+    # Common Index Values for all type of reports
+#    ownerEmailIndex = fileheader.index('Case Owner eMail')
+#    caseIndex = fileheader.index('Case Number')    # caseID
+#    ownerName = fileheader.index('Case Owner')
+#    if ("PPID bad" in reportName):
+#        asLocPrimary = fileheader.index('Asset Location: Primary')
+#        asLocStatus = fileheader.index('Asset Location: Location Status')
+#        countrySub = fileheader.index('Country of Submitter')
+#        reqRoleIndex = fileheader.index('Requestor Role')  # Req Role
+#        asCountryLoc = fileheader.index('Asset Location: Country')
+#        reqEmailIndex = fileheader.index('Case Requestor Email')
+#    elif ("PPID miss" in reportName):
+#        reqRoleIndex = fileheader.index('Requestor Role')  # Req Role
+#        caseBU = fileheader.index('BU')
+#        reqEmailIndex = fileheader.index('Case Requestor Email')
+#    elif ("missOPPID" in reportName):
+#        emailSubject = fileheader.index('Subject')
+#        emailDescription = fileheader.index('Case description')
+#    else:
+#        sys.stderr.write("ERROR: REport is unknown so we can take headers")
+#    return 1
 
 
 def main():
