@@ -97,6 +97,45 @@ def missOppId_function(data, CaseID, OwnerEmail, OwnerName, Description,
     return 1
 
 
+def missPPIDbad_function(data, CaseID, OwnerEmail, OwnerName, asLocPrimary,
+                         reqEmail, reqRole, asLocStatus, countrySub,
+                         asCountryLoc):
+    for row in data:
+        if not functions.IsLocationPrimary(row[asLocPrimary]):
+            insertConsultCase(row[OwnerName], row[OwnerEmail], int(row[CaseID]),
+                              'LocationNotPrimary')
+        if functions.emailReqContains(row[reqEmail]):
+            insertConsultCase(row[OwnerName], row[OwnerEmail], int(row[CaseID]),
+                              'ReqEndHPE')
+        if not functions.caseRoleIsPartner(row[reqRole]):
+            insertConsultCase(row[OwnerName], row[OwnerEmail], int(row[CaseID]),
+                              'RoleIsNotPartner')
+        if not functions.isLocationStatus(row[asLocStatus]):
+            insertConsultCase(row[OwnerName], row[OwnerEmail], int(row[CaseID]),
+                              'LocStatusDisable')
+        if not functions.countrySubLocEqual(row[countrySub],
+                                            row[asCountryLoc]):
+            insertConsultCase(row[OwnerName], row[OwnerEmail], int(row[CaseID]),
+                              'countrySubLoc')
+
+
+def missPIDD_function(data, CaseID, OwnerEmail, OwnerName, ReqEmail, ReqRole,
+                      caseBU):
+    for row in data:
+        if not functions.RequestorRoleIsPartner(row[ReqEmail], row[ReqRole]):
+            insertConsultCase(row[OwnerName], row[OwnerEmail], int(row[CaseID]),
+                              'RoleIsNotPartner')
+        if functions.BUisMissing(row[caseBU]):
+            insertConsultCase(row[OwnerName], row[OwnerEmail],
+                              int(row[CaseID]), 'BUisMissing')
+        if functions.emailReqContains(row[ReqEmail]):
+            insertConsultCase(row[OwnerName], row[OwnerEmail], int(row[CaseID]),
+                              "ReqEndHPE")
+        # All these cases do NOT have Asset Location ID
+        insertConsultCase(row[OwnerName], row[OwnerEmail], int(row[CaseID]),
+                          'PPIDmiss')
+
+
 def returnOPPID(text):
     oppID = 0
     match = re.search(r"\d{10}", text)
@@ -109,11 +148,11 @@ def returnOPPID(text):
 reportsIndexesDict = {}
 
 
-#def retreivingFileIndexes(fileheader):
-    # WE receive a CSV header and we take header indexes for our reports
-    # We read CSV header!
-    # Specific Index values for reports
-    # Common Index Values for all type of reports
+# def retreivingFileIndexes(fileheader):
+# WE receive a CSV header and we take header indexes for our reports
+# We read CSV header!
+# Specific Index values for reports
+# Common Index Values for all type of reports
 #    ownerEmailIndex = fileheader.index('Case Owner eMail')
 #    caseIndex = fileheader.index('Case Number')    # caseID
 #    ownerName = fileheader.index('Case Owner')
@@ -179,48 +218,18 @@ def main():
         # Python closes files automatically but... what the hell!
         ReportCsv.close()
 
+    # We send to each function all csv line (except header and tail [1:-7] +
+    # We send them ->index value<- of each data field.
     if ("missOPPID" in reportName):
         missOppId_function(data[1:-7], caseIndex, ownerEmailIndex, ownerName,
                            emailDescription, emailSubject)
     elif ("PPID bad" in reportName):
-        for row in data[1:-7]:  # Skip CSV header and last lines!
-            if not functions.IsLocationPrimary(row[asLocPrimary]):
-                insertConsultCase(row[ownerName], row[ownerEmailIndex],
-                                    int(row[caseIndex]), 'LocationNotPrimary')
-            if functions.emailReqContains(row[reqEmailIndex]):
-                insertConsultCase(row[ownerName], row[ownerEmailIndex],
-                                    int(row[caseIndex]), 'ReqEndHPE')
-            if not functions.caseRoleIsPartner(row[reqRoleIndex]):
-                insertConsultCase(row[ownerName], row[ownerEmailIndex],
-                                    int(row[caseIndex]), 'RoleIsNotPartner')
-            if not functions.isLocationStatus(row[asLocStatus]):
-                insertConsultCase(row[ownerName], row[ownerEmailIndex],
-                                    int(row[caseIndex]), 'LocStatusDisable')
-            if not functions.countrySubLocEqual(row[countrySub],
-                                                row[asCountryLoc]):
-                insertConsultCase(row[ownerName], row[ownerEmailIndex],
-                                    int(row[caseIndex]), 'countrySubLoc')
+        missPPIDbad_function(data[1:-7], caseIndex, ownerEmailIndex, ownerName,
+                             asLocPrimary, reqEmailIndex, reqRoleIndex,
+                             asLocStatus, countrySub, asCountryLoc)
     elif ("PPID miss" in reportName):
-        # ppidMiss_function(data[1:-7], caseIndex, ownerEmailIndex, ownerName
-        for row in data[1:-7]:  # Skip CSV header and last lines!
-            if not functions.RequestorRoleIsPartner(row[reqEmailIndex],
-                                                row[reqRoleIndex]):
-                insertConsultCase(row[ownerName], row[ownerEmailIndex],
-                                    int(row[caseIndex]), 'RoleIsNotPartner')
-            if functions.BUisMissing(row[caseBU]):
-                insertConsultCase(row[ownerName], row[ownerEmailIndex],
-                                    int(row[caseIndex]), 'BUisMissing')
-            if functions.emailReqContains(row[reqEmailIndex]):
-                insertConsultCase(row[ownerName], row[ownerEmailIndex],
-                                    int(row[caseIndex]), "ReqEndHPE")
-#            if functions.partnerInList(row[reqEmailIndex],
-#                                        row[reqRoleIndex]):
-                # print("foo %s" % row[caseIndex])
-#                insertConsultCase(row[ownerName], row[ownerEmailIndex],
-#                                    int(row[caseIndex]), 'ReqIsNotHPE')
-            # All these cases do NOT have Asset Location ID
-            insertConsultCase(row[ownerName], row[ownerEmailIndex],
-                                int(row[caseIndex]), 'PPIDmiss')
+        missPIDD_function(data[1:-7], caseIndex, ownerEmailIndex, ownerName,
+                          reqEmailIndex, reqRoleIndex, caseBU)
     # print cases per Consultant!!
     printListCases()
     # emailToConsultant()
