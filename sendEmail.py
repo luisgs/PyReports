@@ -24,13 +24,12 @@ def emailToConsultant(employee, email, listCases):
     # me == my email address
     # consultant == recipient's email address
     me = variables.emailFrom
-    consultant = employee
 
     # Create message container - the correct MIME type is multipart/alternative.
     msg = MIMEMultipart('alternative')
     msg['Subject'] = "Please, some of your cases need corrections"
     msg['From'] = me
-    msg['To'] = consultant
+    msg['To'] = email
     msg['Cc'] = ""
     msg['Bc'] = ""
 
@@ -53,7 +52,6 @@ Thank you!
 </body>
 </html>
     """ % (employee.partition(' ')[0], listConsulCases(listCases))
-    print(html)
     # Record the MIME types of both parts - text/plain and text/html.
     part1 = MIMEText(text, 'plain')
     part2 = MIMEText(html, 'html')
@@ -71,12 +69,13 @@ Thank you!
     s.login(variables.emailFrom, variables.password)
     # sendmail function takes 3 arguments: sender's address, recipient's address
     # and message to send - here it is sent as one string.
-    s.sendmail(me, consultant, msg.as_string())
+    s.sendmail(me, email, msg.as_string())
     s.quit()
 
 
 def sendEmailToConsultants(ListOfErrors):
-    emailToConsultant(ListOfErrors[0][0], "luis.ild@gmail.com",ListOfErrors[0][2])
+    print("Sending email")
+#    emailToConsultant(ListOfErrors[0][0], "luis.ild@gmail.com", ListOfErrors[0][2])
 #    [emailToConsultant(consultantReport[0],
 #                       consultantReport[1],
 #                       consultantReport[2]) for consultantReport in ListOfErrors]

@@ -139,33 +139,6 @@ def returnOPPID(text):
 reportsIndexesDict = {}
 
 
-# def retreivingFileIndexes(fileheader):
-# WE receive a CSV header and we take header indexes for our reports
-# We read CSV header!
-# Specific Index values for reports
-# Common Index Values for all type of reports
-#    ownerEmailIndex = fileheader.index('Case Owner eMail')
-#    caseIndex = fileheader.index('Case Number')    # caseID
-#    ownerName = fileheader.index('Case Owner')
-#    if ("PPID bad" in reportName):
-#        asLocPrimary = fileheader.index('Asset Location: Primary')
-#        asLocStatus = fileheader.index('Asset Location: Location Status')
-#        countrySub = fileheader.index('Country of Submitter')
-#        reqRoleIndex = fileheader.index('Requestor Role')  # Req Role
-#        asCountryLoc = fileheader.index('Asset Location: Country')
-#        reqEmailIndex = fileheader.index('Case Requestor Email')
-#    elif ("PPID miss" in reportName):
-#        reqRoleIndex = fileheader.index('Requestor Role')  # Req Role
-#        caseBU = fileheader.index('BU')
-#        reqEmailIndex = fileheader.index('Case Requestor Email')
-#    elif ("missOPPID" in reportName):
-#        emailSubject = fileheader.index('Subject')
-#        emailDescription = fileheader.index('Case description')
-#    else:
-#        sys.stderr.write("ERROR: REport is unknown so we can take headers")
-#    return 1
-
-
 def generateReport(fname):
     isItAFile(fname)
     try:
@@ -222,13 +195,12 @@ def generateReport(fname):
         missPIDD_function(data[1:-7], caseIndex, ownerEmailIndex, ownerName,
                           reqEmailIndex, reqRoleIndex, caseBU)
     # print cases per Consultant!!
-#    printListCases()
-    # emailToConsultant()
-    sendEmail.sendEmailToConsultants(ListOfErrors)
+
 
 def main():
     for i in range(1, len(sys.argv)):
         generateReport(sys.argv[i])
+    sendEmail.sendEmailToConsultants(ListOfErrors)
     printListCases()
 
 
