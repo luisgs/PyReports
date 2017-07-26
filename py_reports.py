@@ -44,12 +44,6 @@ def printListCases():
                           str(dictCasesOPP[str(case)]))
 
 
-def emailToConsultant():
-    [sendEmail.emailToConsultant(consultantReport[0],
-                                 consultantReport[1],
-                                 consultantReport[2]) for
-     consultantReport in ListOfErrors]
-
 
 def insertConsultCase(Name, Email, CaseNumber, ErrorCode):
     for i in range(len(ListOfErrors)):
@@ -230,7 +224,7 @@ def generateReport(fname):
     # print cases per Consultant!!
 #    printListCases()
     # emailToConsultant()
-
+    sendEmail.sendEmailToConsultants(ListOfErrors)
 
 def main():
     for i in range(1, len(sys.argv)):

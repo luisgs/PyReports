@@ -2,7 +2,6 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import variables
-import globalVariables
 
 # We bring into our lib global variables such as passwords, emails...
 variables.init()
@@ -72,6 +71,12 @@ Thank you!
     s.login(variables.emailFrom, variables.password)
     # sendmail function takes 3 arguments: sender's address, recipient's address
     # and message to send - here it is sent as one string.
-    consultant = "luis@.com"
-    # s.sendmail(me, consultant, msg.as_string())
+    consultant = "luis.gomez@hpe.com"
+    s.sendmail(me, consultant, msg.as_string())
     s.quit()
+
+
+def sendEmailToConsultants(ListOfErrors):
+    [emailToConsultant(consultantReport[0],
+                       consultantReport[1],
+                       consultantReport[2]) for consultantReport in ListOfErrors]
