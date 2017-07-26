@@ -71,12 +71,12 @@ Thank you!
     s.login(variables.emailFrom, variables.password)
     # sendmail function takes 3 arguments: sender's address, recipient's address
     # and message to send - here it is sent as one string.
-    consultant = "luis.gomez@hpe.com"
     s.sendmail(me, consultant, msg.as_string())
     s.quit()
 
 
 def sendEmailToConsultants(ListOfErrors):
-    [emailToConsultant(consultantReport[0],
-                       consultantReport[1],
-                       consultantReport[2]) for consultantReport in ListOfErrors]
+    emailToConsultant(ListOfErrors[0][0], "luis.ild@gmail.com",ListOfErrors[0][2])
+#    [emailToConsultant(consultantReport[0],
+#                       consultantReport[1],
+#                       consultantReport[2]) for consultantReport in ListOfErrors]
