@@ -24,13 +24,10 @@ ErrorsDefinition = globalVariables.ErrorsDefinition
 ListOfReports = ["missOPPID", "PPID miss", "PPID bad"]
 
 
-def doWeHaveAFile():
+def isItAFile(filename):
     "We have a file as arg that exist and it is readable"
-    if len(sys.argv) < 2:
-        sys.stderr.write('Usage: sys.argv[0], Please pass me a file!\n')
-        sys.exit(1)
-    if not os.path.exists(sys.argv[1]):
-        sys.stderr.write('ERROR: File does NOT exist\n')
+    if not (os.path.isfile(filename) and os.access(filename, os.R_OK)):
+        sys.stderr.write('ERROR: Filename is not a file OR it is not readable\n')
         sys.exit(1)
     return 1
 
@@ -65,7 +62,7 @@ def insertConsultCase(Name, Email, CaseNumber, ErrorCode):
                 # If key (CaseNumber) does not exist, I add it
                 # ListOfErrors[i][2][CaseNumber] = [ErrorsDefinition[ErrorCode]]
                 ListOfErrors[i][2][CaseNumber] = [ErrorCode]
-                return
+            return 1
     # List is empty OR new consultant in list!
     ListOfErrors.append([Name, Email,
                          {CaseNumber: [ErrorCode]}])
@@ -175,10 +172,10 @@ reportsIndexesDict = {}
 #    return 1
 
 
-def main():
-    doWeHaveAFile()
+def generateReport(fname):
+    isItAFile(fname)
     try:
-        with codecs.open(sys.argv[1], 'r', 'iso-8859-1') as ReportCsv:
+        with codecs.open(fname, 'r', 'iso-8859-1') as ReportCsv:
             reader = csv.reader(ReportCsv)
             data = list(reader)
             # with which report are we working on?
@@ -231,8 +228,14 @@ def main():
         missPIDD_function(data[1:-7], caseIndex, ownerEmailIndex, ownerName,
                           reqEmailIndex, reqRoleIndex, caseBU)
     # print cases per Consultant!!
-    printListCases()
+#    printListCases()
     # emailToConsultant()
+
+
+def main():
+    for i in range(1, len(sys.argv)):
+        generateReport(sys.argv[i])
+    printListCases()
 
 
 if __name__ == "__main__":
