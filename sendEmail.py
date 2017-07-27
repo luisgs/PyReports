@@ -75,7 +75,8 @@ Thank you!
 
 def sendEmailToConsultants(ListOfErrors):
     print("Sending email")
-#    emailToConsultant(ListOfErrors[0][0], "luis.ild@gmail.com", ListOfErrors[0][2])
-#    [emailToConsultant(consultantReport[0],
-#                       consultantReport[1],
-#                       consultantReport[2]) for consultantReport in ListOfErrors]
+    # Email testing line
+    # emailToConsultant(ListOfErrors[0][0], "test", ListOfErrors[0][2])
+    #    [emailToConsultant(consultantReport[0],
+    #                       consultantReport[1],
+    #                       consultantReport[2]) for consultantReport in ListOfErrors]

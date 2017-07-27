@@ -27,7 +27,7 @@ ListOfReports = ["missOPPID", "PPID miss", "PPID bad"]
 def isItAFile(filename):
     "We have a file as arg that exist and it is readable"
     if not (os.path.isfile(filename) and os.access(filename, os.R_OK)):
-        sys.stderr.write('ERROR: Filename is not a file OR it is not readable\n')
+        sys.stderr.write('ERROR: Path is not a file OR not readable\n')
         sys.exit(1)
     return 1
 
@@ -42,7 +42,6 @@ def printListCases():
                 if ((Error == "missOPPID") and (str(case) in dictCasesOPP)):
                     print("\t\t\t Our suggestion is to write: " +
                           str(dictCasesOPP[str(case)]))
-
 
 
 def insertConsultCase(Name, Email, CaseNumber, ErrorCode):
@@ -148,9 +147,9 @@ def generateReport(fname):
             # with which report are we working on?
             # report definition is set at the bottom of the file
             reportName = whichReportIsIt(data[-5][0])
-            print(reportName)
+            # print(reportName)
             if ("Unknown" in reportName):
-                sys.stderr.write("ERROR: This report file has not been recognize\n")
+                sys.stderr.write("ERROR: %s has not been recognize\n" % fname)
                 sys.exit(1)
             # We read CSV header!
             # Specific Index values for reports
