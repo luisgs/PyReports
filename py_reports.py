@@ -199,7 +199,7 @@ def generateReport(fname):
 def main(argv):
     for i in range(len(argv)):
         generateReport(argv[i])
-    sendEmail.sendEmailToConsultants(ListOfErrors)
+  #   sendEmail.sendEmailToConsultants(ListOfErrors)
     printListCases()
 
 

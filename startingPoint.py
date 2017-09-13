@@ -6,9 +6,8 @@ import py_reports
 # Reports will be downloaded in automatically in our Download folder.
 # Downloads
 os.system('start chrome "https://hp.my.salesforce.com/00O27000007XetZ?isdtp=mn&export=1&enc=iso-8859-1&xf=csv"')
-os.system('start chrome "https://hp.my.salesforce.com/00O27000007XetZ?isdtp=mn&export=1&enc=iso-8859-1&xf=csv"')
-os.system('start chrome "https://hp.my.salesforce.com/00O27000007XetZ?isdtp=mn&export=1&enc=iso-8859-1&xf=csv"')
-
+os.system('start chrome "https://hp.my.salesforce.com/00O27000007Xezh?isdtp=mn&export=1&enc=iso-8859-1&xf=csv"')
+os.system('start chrome "https://hp.my.salesforce.com/00O27000007UA3S?isdtp=mn&export=1&enc=iso-8859-1&xf=csv"')
 # we need to wait so we can download our reports and later look for them
 time.sleep(20)
 
