@@ -196,12 +196,12 @@ def generateReport(fname):
     # print cases per Consultant!!
 
 
-def main():
-    for i in range(1, len(sys.argv)):
-        generateReport(sys.argv[i])
+def main(argv):
+    for i in range(len(argv)):
+        generateReport(argv[i])
     sendEmail.sendEmailToConsultants(ListOfErrors)
     printListCases()
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(main(sys.argv))
