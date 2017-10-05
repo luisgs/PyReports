@@ -16,6 +16,11 @@ ListOfErrors = []
 dictCasesOPP = {}
 
 
+# Our final list of errors that we will send to sendEmail function.
+# ==> ['Luis', 'luis@email.com', {Case1: [ErrorDEFINITION-SOLUTION]}]
+ReadyToSend= []
+
+
 # we bring our dict  of errors
 ErrorsDefinition = globalVariables.ErrorsDefinition
 
@@ -33,15 +38,12 @@ def isItAFile(filename):
 
 
 def printListCases():
-    for consultantInfo in ListOfErrors:
-        print(consultantInfo[0] + " (" + consultantInfo[1] + "):")
-        for case in consultantInfo[2]:
-            print("\t"+str(case))
+    for consultantInfo in ListOfErrors:		# take the first consultant 
+        print(consultantInfo[0] + " (" + consultantInfo[1] + "):") # print his name and email
+        for case in consultantInfo[2]:		# take his dict of cases:errors
+            print("\t"+str(case))		# print Case Number
             for Error in consultantInfo[2][case]:
-                print("\t\t"+str(ErrorsDefinition[Error]))
-                if ((Error == "missOPPID") and (str(case) in dictCasesOPP)):
-                    print("\t\t\t Our suggestion is to write: " +
-                          str(dictCasesOPP[str(case)]))
+                print("\t\t"+str(Error))	# print his Error!
 
 
 def insertConsultCase(Name, Email, CaseNumber, ErrorCode):
@@ -74,16 +76,18 @@ def whichReportIsIt(CSVfield):
 def missOppId_function(data, CaseID, OwnerEmail, OwnerName, Description,
                        Subject):
     for row in data:
-        insertConsultCase(row[OwnerName], row[OwnerEmail],
-                          int(row[CaseID]), 'missOPPID')
         # look for a OppID in text
         oppID = returnOPPID(row[Description])
-
         if not oppID:
             oppID = returnOPPID(row[Subject])
         # In case of Subject or Description have it, insert it!
         if oppID:
             dictCasesOPP.update({row[CaseID]: oppID})
+            insertConsultCase(row[OwnerName], row[OwnerEmail],
+                          int(row[CaseID]), ErrorsDefinition['missOPPID'] + "\t We beleive is this: " + oppID)
+        else: # We could not get the OppID from the email!
+            insertConsultCase(row[OwnerName], row[OwnerEmail],
+                          int(row[CaseID]), ErrorsDefinition['missOPPID'])
     return 1
 
 
@@ -93,20 +97,20 @@ def missPPIDbad_function(data, CaseID, OwnerEmail, OwnerName, asLocPrimary,
     for row in data:
         if not functions.IsLocationPrimary(row[asLocPrimary]):
             insertConsultCase(row[OwnerName], row[OwnerEmail], int(row[CaseID]),
-                              'LocationNotPrimary')
+                              ErrorsDefinition['LocationNotPrimary'])
         if functions.emailReqContains(row[reqEmail]):
             insertConsultCase(row[OwnerName], row[OwnerEmail], int(row[CaseID]),
-                              'ReqEndHPE')
+                              ErrorsDefinition['ReqEndHPE'])
         if not functions.caseRoleIsPartner(row[reqRole]):
             insertConsultCase(row[OwnerName], row[OwnerEmail], int(row[CaseID]),
-                              'RoleIsNotPartner')
+                              ErrorsDefinition['RoleIsNotPartner'])
         if not functions.isLocationStatus(row[asLocStatus]):
             insertConsultCase(row[OwnerName], row[OwnerEmail], int(row[CaseID]),
-                              'LocStatusDisable')
+                              ErrorsDefinition['LocStatusDisable'])
         if not functions.countrySubLocEqual(row[countrySub],
                                             row[asCountryLoc]):
             insertConsultCase(row[OwnerName], row[OwnerEmail], int(row[CaseID]),
-                              'countrySubLoc')
+                              ErrorsDefinition['countrySubLoc'])
 
 
 def missPIDD_function(data, CaseID, OwnerEmail, OwnerName, ReqEmail, ReqRole,
@@ -114,16 +118,16 @@ def missPIDD_function(data, CaseID, OwnerEmail, OwnerName, ReqEmail, ReqRole,
     for row in data:
         if not functions.RequestorRoleIsPartner(row[ReqEmail], row[ReqRole]):
             insertConsultCase(row[OwnerName], row[OwnerEmail], int(row[CaseID]),
-                              'RoleIsNotPartner')
+                              ErrorsDefinition['RoleIsNotPartner'])
         if functions.BUisMissing(row[caseBU]):
             insertConsultCase(row[OwnerName], row[OwnerEmail],
-                              int(row[CaseID]), 'BUisMissing')
+                              int(row[CaseID]), ErrorsDefinition['BUisMissing'])
         if functions.emailReqContains(row[ReqEmail]):
             insertConsultCase(row[OwnerName], row[OwnerEmail], int(row[CaseID]),
-                              "ReqEndHPE")
+                              ErrorsDefinition['ReqEndHPE'])
         # All these cases do NOT have Asset Location ID
         insertConsultCase(row[OwnerName], row[OwnerEmail], int(row[CaseID]),
-                          'PPIDmiss')
+                          ErrorsDefinition['PPIDmiss'])
 
 
 def returnOPPID(text):
@@ -199,7 +203,8 @@ def generateReport(fname):
 def main(argv):
     for i in range(len(argv)):
         generateReport(argv[i])
-  #   sendEmail.sendEmailToConsultants(ListOfErrors)
+    sendEmail.sendEmailToConsultants(ListOfErrors)
+    # Print in the regular output, CLI, all the cases
     printListCases()
 
 

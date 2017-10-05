@@ -9,7 +9,11 @@ os.system('start chrome "https://hp.my.salesforce.com/00O27000007XetZ?isdtp=mn&e
 os.system('start chrome "https://hp.my.salesforce.com/00O27000007Xezh?isdtp=mn&export=1&enc=iso-8859-1&xf=csv"')
 os.system('start chrome "https://hp.my.salesforce.com/00O27000007UA3S?isdtp=mn&export=1&enc=iso-8859-1&xf=csv"')
 # we need to wait so we can download our reports and later look for them
-time.sleep(20)
+print("\\\\Downloading your report files... it might take time.")
+for i in range(10,-1,-1):
+	print("Waiting... %s seconds" % (i))
+	time.sleep(1)
+print("\\\\ Ready for execution!")
 
 # With our reports in our Download folder, we can look for the three newest report*csv files
 # Default path is Downloads
@@ -32,6 +36,7 @@ thirdCSV=max(files , key = os.path.getctime)
 py_reports.main([firstCSV, secondCSV, thirdCSV])
 
 # Delete those CSV files, we do not need them anymore.
+print("Removing report files!")
 os.remove(firstCSV)
 os.remove(secondCSV)
 os.remove(thirdCSV)
