@@ -1,17 +1,24 @@
 # PyReports
-PyReports sends an email to each consultant with misfillings fields at SFDC. It gets data from internal csv reports. 
+PyReports is a script that will download our perdonal SFDC reports, manage them and send an email to each of the consultants which their action is required.
 
 ## Summary
-We close cases in SFDC and some of them are not completed correct fulfilled. This script helps us so it sends emails to each consultant that appears in the reports. It sends a list of his cases that need actions as well as which corrections are needed. 
-Admin retrieves these reports and execute our pyreport script point to them. It will send an individual email to each consultant with a set of points to correct.
+On of our daily tasks, besides of ansewring emails, is to fulfill all the required fields on the case. Sometimes, we forget or these fields are wrongly written. This script helps us in the way that each consultant, with errors in his cases, will receive an email with a list of cases that need his attention as well as the list of errors and actions that need to be taken. 
+
+Script retrieves these reports from a well known url. Reports are formatted in the way we want so script only estructure them and send an email.
 
 ## Requirements
-- Report files
-  These reports are generated via SalesForce according to a well known report we have. Meaning, we know which columns they have.
-- Email account with rights so we can send email through it using it as a gateway
-- Python 
+- Pyton (2 or 3) needs to be installed.
+- Script needs to be executed within our HPE intranet. 
+	- Needs to be logged in SFDC (+access to our reports)
+	- HPE SMTP server is accesible only via our intranet.
+- (Windows) Script needs to run under admin rights.
+
+
 
 ## How to execute it?
-./python py_reports.py reports.csv [report2.csv]
+- Windows: Execute a .bat script:
+	PyReports.bat
+- Linux:
+	./python startingPoint.py
 
 
