@@ -184,7 +184,6 @@ def generateReport(fname):
     finally:
         # Python closes files automatically but... what the hell!
         ReportCsv.close()
-
     # We send to each function all csv line (except header and tail [1:-7] +
     # We send them ->index value<- of each data field.
     if ("missOPPID" in reportName):
@@ -205,7 +204,7 @@ def main(argv):
         generateReport(argv[i])
     sendEmail.sendEmailToConsultants(ListOfErrors)
     # Print in the regular output, CLI, all the cases
-    printListCases()
+    # print(functions.ListAllConsultantsCases(ListOfErrors))
 
 
 if __name__ == "__main__":
